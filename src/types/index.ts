@@ -27,14 +27,15 @@ export interface ForumContextType {
   filters: {
     search: string;
     tags: string[];
-    status: 'all' | 'answered' | 'unanswered';
-    sortBy: 'date' | 'answers';
-    sortOrder: 'asc' | 'desc';
+    status: 'all' | 'answered' | 'unanswered' | string;
+    sort: 'date' | 'answers'| string;
+    order: 'asc' | 'desc'| string;
   };
   pagination: {
     currentPage: number;
     totalPages: number;
     itemsPerPage: number;
+    totalItems:number;
   };
   createQuestion: (title: string, content: string, tags: string[]) => Promise<void>;
   updateQuestion: (id: string, title: string, content: string, tags: string[]) => Promise<void>;
@@ -47,5 +48,6 @@ export interface ForumContextType {
   fetchQuestion: (id: string) => Promise<void>;
   setFilters: (filters: Partial<ForumContextType['filters']>) => void;
   setPage: (page: number) => void;
+  setLimit: (page: number) => void;
   isLoading: boolean;
 }

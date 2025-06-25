@@ -109,7 +109,7 @@ const TagDetailPage: React.FC = () => {
         {sortedQuestions.length > 0 ? (
           <div className="space-y-4">
             {sortedQuestions.map((question) => (
-              <QuestionCard key={question.id} question={question} showActions />
+              <QuestionCard key={question._id} question={question} showActions />
             ))}
           </div>
         ) : (

@@ -2,7 +2,7 @@ import React, { createContext, useContext, useReducer } from "react";
 import { ForumContextType } from "../types";
 import { useAuth } from "./AuthContext";
 import API from "../api";
-import { Question,Answer } from "../types/questions";
+import { Question, Answer } from "../types/questions";
 
 interface ForumState {
   questions: Question[];
@@ -10,14 +10,15 @@ interface ForumState {
   filters: {
     search: string;
     tags: string[];
-    status: "all" | "answered" | "unanswered";
-    sortBy: "date" | "answers";
-    sortOrder: "asc" | "desc";
+    status: "all" | "answered" | "unanswered" | string;
+    sort: "date" | "answers" | string;
+    order: "asc" | "desc" | string;
   };
   pagination: {
     currentPage: number;
     totalPages: number;
     itemsPerPage: number;
+    totalItems: number;
   };
   isLoading: boolean;
 }
@@ -48,7 +49,10 @@ type ForumAction =
       };
     }
   | { type: "SET_FILTERS"; payload: Partial<ForumState["filters"]> }
-  | { type: "SET_PAGE"; payload: number };
+  | { type: "SET_PAGE"; payload: number }
+  | { type: "SET_LIMIT"; payload: number }
+  | { type: "SET_TOTAL_PAGES"; payload: number }
+  | { type: "SET_TOTAL_ITEMS"; payload: number };
 
 const forumReducer = (state: ForumState, action: ForumAction): ForumState => {
   switch (action.type) {
@@ -236,8 +240,8 @@ const forumReducer = (state: ForumState, action: ForumAction): ForumState => {
                     const currentVote = a.userVote;
                     const newVote = action.payload.vote;
 
-                    let likes = a.likes;
-                    let dislikes = a.dislikes;
+                    let likes = a.likeCount;
+                    let dislikes = a.dislikeCount;
 
                     if (currentVote === "like") likes--;
                     if (currentVote === "dislike") dislikes--;
@@ -268,8 +272,8 @@ const forumReducer = (state: ForumState, action: ForumAction): ForumState => {
                     const currentVote = a.userVote;
                     const newVote = action.payload.vote;
 
-                    let likes = a.likes;
-                    let dislikes = a.dislikes;
+                    let likes = a.likeCount;
+                    let dislikes = a.dislikeCount;
 
                     if (currentVote === "like") likes--;
                     if (currentVote === "dislike") dislikes--;
@@ -303,6 +307,21 @@ const forumReducer = (state: ForumState, action: ForumAction): ForumState => {
         ...state,
         pagination: { ...state.pagination, currentPage: action.payload },
       };
+    case "SET_LIMIT":
+      return {
+        ...state,
+        pagination: { ...state.pagination, itemsPerPage: action.payload },
+      };
+    case "SET_TOTAL_PAGES":
+      return {
+        ...state,
+        pagination: { ...state.pagination, totalPages: action.payload },
+      };
+    case "SET_TOTAL_ITEMS":
+      return {
+        ...state,
+        pagination: { ...state.pagination, totalItems: action.payload },
+      };
     default:
       return state;
   }
@@ -329,27 +348,40 @@ export const ForumProvider: React.FC<{ children: React.ReactNode }> = ({
       search: "",
       tags: [],
       status: "all",
-      sortBy: "date",
-      sortOrder: "desc",
+      sort: "date",
+      order: "desc",
     },
     pagination: {
       currentPage: 1,
       totalPages: 1,
       itemsPerPage: 10,
+      totalItems: 0,
     },
     isLoading: false,
   });
 
+  const setFilters = (filters: Partial<ForumState["filters"]>): void => {
+    dispatch({ type: "SET_FILTERS", payload: filters });
+  };
+
+  const setPage = (page: number): void => {
+    dispatch({ type: "SET_PAGE", payload: page });
+  };
+
+  const setLimit = (page: number): void => {
+    dispatch({ type: "SET_LIMIT", payload: page });
+  };
+
   const fetchQuestions = async () => {
     dispatch({ type: "SET_LOADING", payload: true });
 
-    const { search, tags, status, sortBy, sortOrder } = state.filters;
+    const { search, tags, status, sort, order } = state.filters;
     const params = {
       ...(search && { search }),
       ...(tags.length && { tags: tags.join(",") }),
       ...(status !== "all" && { status }),
-      sortBy,
-      sortOrder,
+      sort,
+      order,
       page: state.pagination.currentPage,
       limit: state.pagination.itemsPerPage,
     };
@@ -360,10 +392,11 @@ export const ForumProvider: React.FC<{ children: React.ReactNode }> = ({
       dispatch({ type: "SET_QUESTIONS", payload: res.data.questions });
 
       if (res.data.totalPages) {
-        dispatch({
-          type: "SET_PAGE",
-          payload: Math.min(state.pagination.currentPage, res.data.totalPages),
-        });
+        dispatch({ type: "SET_TOTAL_PAGES", payload: res.data.totalPages });
+      }
+
+      if (res.data.total) {
+        dispatch({ type: "SET_TOTAL_ITEMS", payload: res.data.total });
       }
     } catch (error) {
       console.error("Error fetching questions:", error);
@@ -373,7 +406,7 @@ export const ForumProvider: React.FC<{ children: React.ReactNode }> = ({
 
   React.useEffect(() => {
     fetchQuestions();
-  }, []);
+  }, [state.filters, state.pagination.currentPage]);
 
   const createQuestion = async (
     title: string,
@@ -509,14 +542,6 @@ export const ForumProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
-  const setFilters = (filters: Partial<ForumState["filters"]>): void => {
-    dispatch({ type: "SET_FILTERS", payload: filters });
-  };
-
-  const setPage = (page: number): void => {
-    dispatch({ type: "SET_PAGE", payload: page });
-  };
-
   const value: ForumContextType = {
     questions: state.questions,
     currentQuestion: state.currentQuestion,
@@ -533,6 +558,7 @@ export const ForumProvider: React.FC<{ children: React.ReactNode }> = ({
     fetchQuestion,
     setFilters,
     setPage,
+    setLimit,
     isLoading: state.isLoading,
   };
 

@@ -32,6 +32,7 @@ export const getQuestions = async (req, res, next) => {
       const dir = order === "desc" ? -1 : 1;
       if (sort === "answers") return { answerCount: dir };
       if (sort === "views") return { views: dir };
+      if (sort === "score") return { score: dir };
       return { createdAt: dir };
     })();
 
@@ -55,6 +56,18 @@ export const getQuestions = async (req, res, next) => {
             $subtract: [
               { $size: { $ifNull: ["$likes", []] } },
               { $size: { $ifNull: ["$dislikes", []] } },
+            ],
+          },
+          score: {
+            $subtract: [
+              {
+                $add: [
+                  { $multiply: [{ $size: "$answers" }, 10] },
+                  { $multiply: ["$views", 0.1] },
+                  { $multiply: [{ $size: { $ifNull: ["$likes", []] } }, 5] },
+                ],
+              },
+              { $multiply: [{ $size: { $ifNull: ["$dislikes", []] } }, 2] },
             ],
           },
         },
@@ -248,12 +261,28 @@ export const getQuestion = async (req, res, next) => {
     question.views += 1;
 
     if (req.user) {
-      const userId = req.user.id;
+      const userId = req.user._id?.toString() || req.user.id;
+
       const liked = question.likes?.some((l) => l.user?.toString() === userId);
       const disliked = question.dislikes?.some(
         (d) => d.user?.toString() === userId
       );
       question.userVote = liked ? "like" : disliked ? "dislike" : null;
+
+      if (Array.isArray(question.answers)) {
+        question.answers = question.answers.map((answer) => {
+          const { likes, dislikes, ...rest } = answer;
+          const liked = likes?.some((l) => l.user?.toString() === userId);
+          const disliked = dislikes?.some((d) => d.user?.toString() === userId);
+          return {
+            ...rest,
+            userVote: liked ? "like" : disliked ? "dislike" : null,
+            likeCount: likes?.length || 0,
+            dislikeCount: dislikes?.length || 0,
+            score: (likes?.length || 0) - (dislikes?.length || 0),
+          };
+        });
+      }
     }
 
     question.likeCount = question.likes?.length || 0;

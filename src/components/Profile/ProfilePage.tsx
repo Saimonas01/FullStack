@@ -24,9 +24,9 @@ const ProfilePage: React.FC = () => {
     );
   }
 
-  const userQuestions = questions.filter(q => q.authorId === user.id);
+  const userQuestions = questions.filter(q => q.author._id === user._id);
   const totalAnswers = questions.reduce((total, question) => 
-    total + question.answers.filter(a => a.authorId === user.id).length, 0
+    total + question.answers.filter(a => a.author._id === user._id).length, 0
   );
 
   return (
@@ -118,7 +118,7 @@ const ProfilePage: React.FC = () => {
               .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
               .slice(0, 10)
               .map((question) => (
-                <QuestionCard key={question.id} question={question} showActions />
+                <QuestionCard key={question._id} question={question} showActions />
               ))}
           </div>
         ) : (

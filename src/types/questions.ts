@@ -14,12 +14,13 @@ export interface Answer {
   content: string;
   question: string; // question ID
   author: Author; // author ID
-  likes: UserRef[]; // array of user refs
-  dislikes: UserRef[];
+  likeCount: number; // array of user refs
+  dislikeCount: number;
   isActive: boolean;
   isEdited: boolean;
   createdAt: string;
   updatedAt: string;
+  userVote: string | null;
 }
 
 export interface Question {

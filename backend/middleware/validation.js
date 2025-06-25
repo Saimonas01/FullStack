@@ -47,7 +47,7 @@ export const validateQuestion = [
     .withMessage('Title must be between 10 and 200 characters'),
   body('content')
     .trim()
-    .isLength({ min: 30, max: 10000 })
+    .isLength({ min: 29, max: 10000 })
     .withMessage('Content must be between 30 and 10000 characters'),
   body('tags')
     .isArray({ min: 1, max: 5 })
@@ -120,7 +120,7 @@ export const validateQuestionQuery = [
     .withMessage('Limit must be between 1 and 50'),
   query('sort')
     .optional()
-    .isIn(['date', 'answers', 'views'])
+    .isIn(['date', 'answers', 'views', 'score'])
     .withMessage('Sort must be one of: date, answers, views'),
   query('order')
     .optional()

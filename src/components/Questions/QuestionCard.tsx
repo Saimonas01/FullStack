@@ -53,8 +53,6 @@ const QuestionCard: React.FC<QuestionCardProps> = ({ question, showActions = fal
     return date.toLocaleDateString();
   };
 
-  console.log(question, "DEBUIG")
-
   return (
     <div className="bg-white rounded-lg border border-gray-200 hover:border-gray-300 transition-all duration-200 hover:shadow-sm">
       <div className="p-6">
@@ -66,37 +64,37 @@ const QuestionCard: React.FC<QuestionCardProps> = ({ question, showActions = fal
                 <button
                   onClick={() => handleVote('like')}
                   disabled={isVoting}
-                  // className={`p-1 rounded-full transition-colors ${
-                  //   question.userVote === 'like'
-                  //     ? 'bg-accent-100 text-accent-600'
-                  //     : 'text-gray-400 hover:text-accent-600 hover:bg-accent-50'
-                  // } disabled:opacity-50 disabled:cursor-not-allowed`}
+                  className={`p-1 rounded-full transition-colors ${
+                    question.userVote === 'like'
+                      ? 'bg-accent-100 text-accent-600'
+                      : 'text-gray-400 hover:text-accent-600 hover:bg-accent-50'
+                  } disabled:opacity-50 disabled:cursor-not-allowed`}
                 >
                   <ThumbsUp className="h-4 w-4" />
                 </button>
                 
-                {/* <div className="text-center">
+                <div className="text-center">
                   <div className="text-sm font-semibold text-accent-600">
-                    {question.likes}
+                    {question.likeCount}
                   </div>
                   <div className="text-xs text-gray-500">likes</div>
-                </div> */}
+                </div>
                 
                 <button
                   onClick={() => handleVote('dislike')}
                   disabled={isVoting}
-                  // className={`p-1 rounded-full transition-colors ${
-                  //   question.userVote === 'dislike'
-                  //     ? 'bg-error-100 text-error-600'
-                  //     : 'text-gray-400 hover:text-error-600 hover:bg-error-50'
-                  // } disabled:opacity-50 disabled:cursor-not-allowed`}
+                  className={`p-1 rounded-full transition-colors ${
+                    question.userVote === 'dislike'
+                      ? 'bg-error-100 text-error-600'
+                      : 'text-gray-400 hover:text-error-600 hover:bg-error-50'
+                  } disabled:opacity-50 disabled:cursor-not-allowed`}
                 >
                   <ThumbsDown className="h-4 w-4" />
                 </button>
                 
                 <div className="text-center">
                   <div className="text-sm font-semibold text-error-600">
-                    {/* {question.dislikes} */}
+                    {question.dislikeCount}
                   </div>
                   <div className="text-xs text-gray-500">dislikes</div>
                 </div>

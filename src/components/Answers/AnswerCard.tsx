@@ -82,7 +82,7 @@ const AnswerCard: React.FC<AnswerCardProps> = ({ answer }) => {
           
           <div className="text-center">
             <div className="text-lg font-semibold text-accent-600">
-              {answer.likes.length}
+              {answer.likeCount}
             </div>
             <div className="text-xs text-gray-500">likes</div>
           </div>
@@ -101,7 +101,7 @@ const AnswerCard: React.FC<AnswerCardProps> = ({ answer }) => {
           
           <div className="text-center">
             <div className="text-lg font-semibold text-error-600">
-              {answer.dislikes.length}
+              {answer.dislikeCount}
             </div>
             <div className="text-xs text-gray-500">dislikes</div>
           </div>
@@ -132,7 +132,7 @@ const AnswerCard: React.FC<AnswerCardProps> = ({ answer }) => {
             </div>
 
             {/* Actions */}
-            {user && user.id === answer.author._id && (
+            {user && user._id === answer.author._id && (
               <div className="flex items-center space-x-2">
                 <button
                   onClick={() => setIsEditing(true)}

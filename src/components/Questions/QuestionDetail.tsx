@@ -128,18 +128,18 @@ const QuestionDetail: React.FC = () => {
             <button
               onClick={() => handleVote('like')}
               disabled={!user || isVoting}
-              // className={`p-3 rounded-full transition-colors ${
-              //   currentQuestion.userVote === 'like'
-              //     ? 'bg-accent-100 text-accent-600'
-              //     : 'text-gray-400 hover:text-accent-600 hover:bg-accent-50'
-              // } disabled:opacity-50 disabled:cursor-not-allowed`}
+              className={`p-3 rounded-full transition-colors ${
+                currentQuestion.userVote === 'like'
+                  ? 'bg-accent-100 text-accent-600'
+                  : 'text-gray-400 hover:text-accent-600 hover:bg-accent-50'
+              } disabled:opacity-50 disabled:cursor-not-allowed`}
             >
               <ThumbsUp className="h-6 w-6" />
             </button>
             
             <div className="text-center">
               <div className="text-2xl font-bold text-accent-600">
-                {/* {currentQuestion.likes} */}
+                {currentQuestion.likeCount}
               </div>
               <div className="text-sm text-gray-500">likes</div>
             </div>
@@ -147,18 +147,18 @@ const QuestionDetail: React.FC = () => {
             <button
               onClick={() => handleVote('dislike')}
               disabled={!user || isVoting}
-              // className={`p-3 rounded-full transition-colors ${
-              //   currentQuestion.userVote === 'dislike'
-              //     ? 'bg-error-100 text-error-600'
-              //     : 'text-gray-400 hover:text-error-600 hover:bg-error-50'
-              // } disabled:opacity-50 disabled:cursor-not-allowed`}
+              className={`p-3 rounded-full transition-colors ${
+                currentQuestion.userVote === 'dislike'
+                  ? 'bg-error-100 text-error-600'
+                  : 'text-gray-400 hover:text-error-600 hover:bg-error-50'
+              } disabled:opacity-50 disabled:cursor-not-allowed`}
             >
               <ThumbsDown className="h-6 w-6" />
             </button>
             
             <div className="text-center">
               <div className="text-2xl font-bold text-error-600">
-                {/* {currentQuestion.dislikes} */}
+                {currentQuestion.dislikeCount}
               </div>
               <div className="text-sm text-gray-500">dislikes</div>
             </div>
@@ -170,7 +170,7 @@ const QuestionDetail: React.FC = () => {
             <div className="flex items-center space-x-6 text-sm text-gray-500 mb-4">
               <div className="flex items-center space-x-1">
                 <MessageSquare className="h-4 w-4" />
-                <span>{currentQuestion.answers.length} answers</span>
+                <span>{currentQuestion.answerCount} answers</span>
               </div>
               <div className="flex items-center space-x-1">
                 <Eye className="h-4 w-4" />
@@ -240,7 +240,7 @@ const QuestionDetail: React.FC = () => {
         {currentQuestion.answers.length > 0 ? (
           <div className="space-y-6">
             {currentQuestion.answers
-              .sort((a, b) => b.likes.length - b.dislikes.length - (a.likes.length - a.dislikes.length))
+              .sort((a, b) => b.likeCount - b.dislikeCount - (a.likeCount - a.dislikeCount))
               .map((answer) => (
                 <AnswerCard key={answer._id} answer={answer} />
               ))}

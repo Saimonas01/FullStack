@@ -25,7 +25,7 @@ const QuestionForm: React.FC<QuestionFormProps> = ({ isEdit = false }) => {
     if (isEdit && id) {
       fetchQuestion(id);
     }
-  }, [isEdit, id, fetchQuestion]);
+  }, [isEdit, id]);
 
   React.useEffect(() => {
     if (isEdit && currentQuestion) {
@@ -101,7 +101,7 @@ const QuestionForm: React.FC<QuestionFormProps> = ({ isEdit = false }) => {
     );
   }
 
-  if (isEdit && currentQuestion && user?.id !== currentQuestion.authorId) {
+  if (isEdit && currentQuestion && user?._id !== currentQuestion.author._id) {
     return (
       <div className="max-w-4xl mx-auto text-center py-12">
         <h2 className="text-2xl font-bold text-gray-900 mb-4">Access Denied</h2>
