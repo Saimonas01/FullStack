@@ -405,3 +405,77 @@ export const deleteQuestion = async (req, res, next) => {
     next(error);
   }
 };
+
+export const voteQuestion = async (req, res, next) => {
+  try {
+    const { vote } = req.body;
+    const questionId = req.params.id;
+    const userId = req.user._id.toString();
+
+    if (!["like", "dislike"].includes(vote)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Vote must be either "like" or "dislike"',
+      });
+    }
+
+    const question = await Question.findById(questionId);
+
+    if (!question || !question.isActive) {
+      return res.status(404).json({
+        success: false,
+        message: "Question not found",
+      });
+    }
+
+    const existingLike = question.likes.find((like) => like.user === userId);
+    const existingDislike = question.dislikes.find(
+      (dislike) => dislike.user === userId
+    );
+
+    if (existingLike) {
+      question.likes = question.likes.filter((like) => like.user !== userId);
+    }
+    if (existingDislike) {
+      question.dislikes = question.dislikes.filter(
+        (dislike) => dislike.user !== userId
+      );
+    }
+
+    if (vote === "like" && !existingLike) {
+      question.likes.push({ user: userId });
+    } else if (vote === "dislike" && !existingDislike) {
+      question.dislikes.push({ user: userId });
+    }
+
+    await question.save();
+
+    const updatedQuestion = await Question.findById(questionId);
+
+    const userLike = updatedQuestion.likes.find((like) => like.user === userId);
+    const userDislike = updatedQuestion.dislikes.find(
+      (dislike) => dislike.user === userId
+    );
+
+    const db = getDB();
+    const author = await db
+      .collection("users")
+      .findOne(
+        { _id: new ObjectId(req.user._id) },
+        { projection: { username: 1, reputation: 1, avatar: 1 } }
+      );
+
+    res.status(200).json({
+      success: true,
+      question: {
+        ...updatedQuestion,
+        userVote: userLike ? "like" : userDislike ? "dislike" : null,
+        likeCount: updatedQuestion.likes.length,
+        dislikeCount: updatedQuestion.dislikes.length,
+        author,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};

@@ -1,6 +1,7 @@
-import Answer from '../models/Answer.js';
-import Question from '../models/Question.js';
-
+import Answer from "../models/Answer.js";
+import { getDB } from "../config/database.js";
+import Question from "../models/Question.js";
+import { ObjectId } from "mongodb";
 
 export const createAnswer = async (req, res, next) => {
   try {
@@ -11,21 +12,33 @@ export const createAnswer = async (req, res, next) => {
     if (!question || !question.isActive) {
       return res.status(404).json({
         success: false,
-        message: 'Question not found',
+        message: "Question not found",
       });
     }
 
     const answer = await Answer.create({
       content,
       question: questionId,
-      author: req.user.id,
+      author: req.user._id,
     });
 
-    await answer.populate('author', 'username reputation avatar');
+    const db = getDB();
+    const author = await db
+      .collection("users")
+      .findOne(
+        { _id: new ObjectId(req.user._id) },
+        { projection: { username: 1, reputation: 1, avatar: 1 } }
+      );
 
     res.status(201).json({
       success: true,
-      answer,
+      answer: {
+        ...answer,
+        likeCount: 0,
+        dislikeCount: 0,
+        userVote: null,
+        author,
+      },
     });
   } catch (error) {
     next(error);
@@ -39,14 +52,14 @@ export const updateAnswer = async (req, res, next) => {
     if (!answer || !answer.isActive) {
       return res.status(404).json({
         success: false,
-        message: 'Answer not found',
+        message: "Answer not found",
       });
     }
 
-    if (answer.author.toString() !== req.user.id) {
+    if (answer.author.toString() !== req.user._id.toString()) {
       return res.status(403).json({
         success: false,
-        message: 'Not authorized to update this answer',
+        message: "Not authorized to update this answer",
       });
     }
 
@@ -59,11 +72,22 @@ export const updateAnswer = async (req, res, next) => {
         new: true,
         runValidators: true,
       }
-    ).populate('author', 'username reputation avatar');
+    );
+
+    const db = getDB();
+    const author = await db
+      .collection("users")
+      .findOne(
+        { _id: new ObjectId(req.user._id) },
+        { projection: { username: 1, reputation: 1, avatar: 1 } }
+      );
 
     res.status(200).json({
       success: true,
-      answer,
+      answer:{
+        ...answer,
+        author
+      },
     });
   } catch (error) {
     next(error);
@@ -77,14 +101,14 @@ export const deleteAnswer = async (req, res, next) => {
     if (!answer || !answer.isActive) {
       return res.status(404).json({
         success: false,
-        message: 'Answer not found',
+        message: "Answer not found",
       });
     }
 
-    if (answer.author.toString() !== req.user.id) {
+    if (answer.author.toString() !== req.user._id.toString()) {
       return res.status(403).json({
         success: false,
-        message: 'Not authorized to delete this answer',
+        message: "Not authorized to delete this answer",
       });
     }
 
@@ -92,7 +116,7 @@ export const deleteAnswer = async (req, res, next) => {
 
     res.status(200).json({
       success: true,
-      message: 'Answer deleted successfully',
+      message: "Answer deleted successfully",
     });
   } catch (error) {
     next(error);
@@ -103,9 +127,9 @@ export const voteAnswer = async (req, res, next) => {
   try {
     const { vote } = req.body;
     const answerId = req.params.id;
-    const userId = req.user.id;
+    const userId = req.user._id.toString();
 
-    if (!['like', 'dislike'].includes(vote)) {
+    if (!["like", "dislike"].includes(vote)) {
       return res.status(400).json({
         success: false,
         message: 'Vote must be either "like" or "dislike"',
@@ -117,39 +141,56 @@ export const voteAnswer = async (req, res, next) => {
     if (!answer || !answer.isActive) {
       return res.status(404).json({
         success: false,
-        message: 'Answer not found',
+        message: "Answer not found",
       });
     }
 
-    const existingLike = answer.likes.find(like => like.user.toString() === userId);
-    const existingDislike = answer.dislikes.find(dislike => dislike.user.toString() === userId);
+    const existingLike = answer.likes.find((like) => like.user === userId);
+    const existingDislike = answer.dislikes.find(
+      (dislike) => dislike.user === userId
+    );
 
     if (existingLike) {
-      answer.likes = answer.likes.filter(like => like.user.toString() !== userId);
+      answer.likes = answer.likes.filter((like) => like.user !== userId);
     }
     if (existingDislike) {
-      answer.dislikes = answer.dislikes.filter(dislike => dislike.user.toString() !== userId);
+      answer.dislikes = answer.dislikes.filter(
+        (dislike) => dislike.user !== userId
+      );
     }
 
-    if (vote === 'like' && !existingLike) {
+    if (vote === "like" && !existingLike) {
       answer.likes.push({ user: userId });
-    } else if (vote === 'dislike' && !existingDislike) {
+    } else if (vote === "dislike" && !existingDislike) {
       answer.dislikes.push({ user: userId });
     }
 
     await answer.save();
 
-    const updatedAnswer = await Answer.findById(answerId)
-      .populate('author', 'username reputation avatar');
+    const updatedAnswer = await Answer.findById(answerId);
 
-    const userLike = updatedAnswer.likes.find(like => like.user.toString() === userId);
-    const userDislike = updatedAnswer.dislikes.find(dislike => dislike.user.toString() === userId);
-    const answerObj = updatedAnswer.toObject();
-    answerObj.userVote = userLike ? 'like' : userDislike ? 'dislike' : null;
+    const userLike = updatedAnswer.likes.find((like) => like.user === userId);
+    const userDislike = updatedAnswer.dislikes.find(
+      (dislike) => dislike.user === userId
+    );
+
+    const db = getDB();
+    const author = await db
+      .collection("users")
+      .findOne(
+        { _id: new ObjectId(req.user._id) },
+        { projection: { username: 1, reputation: 1, avatar: 1 } }
+      );
 
     res.status(200).json({
       success: true,
-      answer: answerObj,
+      answer: {
+        ...updatedAnswer,
+        userVote: userLike ? "like" : userDislike ? "dislike" : null,
+        likeCount: updatedAnswer.likes.length,
+        dislikeCount: updatedAnswer.dislikes.length,
+        author,
+      },
     });
   } catch (error) {
     next(error);

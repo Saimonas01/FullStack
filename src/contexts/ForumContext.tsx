@@ -36,10 +36,9 @@ type ForumAction =
   | { type: "ADD_ANSWER"; payload: { questionId: string; answer: Answer } }
   | {
       type: "UPDATE_ANSWER";
-      payload: { questionId: string; answerId: string; content: string };
+      payload: { questionId: string; answer: Answer };
     }
   | { type: "DELETE_ANSWER"; payload: { questionId: string; answerId: string } }
-  | { type: "VOTE_QUESTION"; payload: { id: string; vote: "like" | "dislike" } }
   | {
       type: "VOTE_ANSWER";
       payload: {
@@ -118,12 +117,10 @@ const forumReducer = (state: ForumState, action: ForumAction): ForumState => {
             ? {
                 ...q,
                 answers: q.answers.map((a) =>
-                  a._id === action.payload.answerId
+                  a._id === action.payload.answer._id
                     ? {
                         ...a,
-                        content: action.payload.content,
-                        isEdited: true,
-                        updatedAt: new Date().toISOString(),
+                        ...action.payload.answer,
                       }
                     : a
                 ),
@@ -135,12 +132,10 @@ const forumReducer = (state: ForumState, action: ForumAction): ForumState => {
             ? {
                 ...state.currentQuestion,
                 answers: state.currentQuestion.answers.map((a) =>
-                  a._id === action.payload.answerId
+                  a._id === action.payload.answer._id
                     ? {
                         ...a,
-                        content: action.payload.content,
-                        isEdited: true,
-                        updatedAt: new Date().toISOString(),
+                        ...action.payload.answer,
                       }
                     : a
                 ),
@@ -172,62 +167,7 @@ const forumReducer = (state: ForumState, action: ForumAction): ForumState => {
             : state.currentQuestion,
         isLoading: false,
       };
-    case "VOTE_QUESTION":
-      return {
-        ...state,
-        questions: state.questions.map((q) => {
-          if (q._id === action.payload.id) {
-            const currentVote = q.userVote;
-            const newVote = action.payload.vote;
 
-            let likes = q.likeCount;
-            let dislikes = q.dislikeCount;
-
-            if (currentVote === "like") likes--;
-            if (currentVote === "dislike") dislikes--;
-
-            if (newVote !== currentVote) {
-              if (newVote === "like") likes++;
-              if (newVote === "dislike") dislikes++;
-            }
-
-            return {
-              ...q,
-              likes,
-              dislikes,
-              userVote: newVote === currentVote ? null : newVote,
-            };
-          }
-          return q;
-        }),
-        currentQuestion:
-          state.currentQuestion?._id === action.payload.id
-            ? (() => {
-                const q = state.currentQuestion;
-                const currentVote = q.userVote;
-                const newVote = action.payload.vote;
-
-                let likes = q.likeCount;
-                let dislikes = q.dislikeCount;
-
-                if (currentVote === "like") likes--;
-                if (currentVote === "dislike") dislikes--;
-
-                if (newVote !== currentVote) {
-                  if (newVote === "like") likes++;
-                  if (newVote === "dislike") dislikes++;
-                }
-
-                return {
-                  ...q,
-                  likes,
-                  dislikes,
-                  userVote: newVote === currentVote ? null : newVote,
-                };
-              })()
-            : state.currentQuestion,
-        isLoading: false,
-      };
     case "VOTE_ANSWER":
       return {
         ...state,
@@ -451,58 +391,61 @@ export const ForumProvider: React.FC<{ children: React.ReactNode }> = ({
 
     dispatch({ type: "SET_LOADING", payload: true });
 
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    try {
+      const res = await API.post(`/answers/${questionId}`, {
+        content,
+      });
 
-    // const newAnswer: Answer = {
-    //   id: Date.now().toString(),
-    //   content,
-    //   questionId,
-    //   authorId: user.id,
-    //   author: user,
-    //   createdAt: new Date().toISOString(),
-    //   isEdited: false,
-    //   likes: 0,
-    //   dislikes: 0,
-    //   userVote: null,
-    // };
-
-    // dispatch({
-    //   type: "ADD_ANSWER",
-    //   payload: { questionId, answer: newAnswer },
-    // });
+      dispatch({
+        type: "ADD_ANSWER",
+        payload: { questionId, answer: res.data.answer },
+      });
+    } catch (error) {
+      console.error("Error creating answer:", error);
+    }
   };
 
   const updateAnswer = async (id: string, content: string): Promise<void> => {
     dispatch({ type: "SET_LOADING", payload: true });
 
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    try {
+      const res = await API.patch(`/answers/${id}`, { content });
 
-    // Find the question that contains this answer
-    const question = state.questions.find((q) =>
-      q.answers.some((a) => a._id === id)
-    );
-    if (question) {
-      dispatch({
-        type: "UPDATE_ANSWER",
-        payload: { questionId: question._id, answerId: id, content },
-      });
+      const question = state.questions.find((q) =>
+        q.answers.some((a) => a._id === id)
+      );
+      if (question) {
+        dispatch({
+          type: "UPDATE_ANSWER",
+          payload: {
+            questionId: question._id,
+            answer: res.data.answer,
+          },
+        });
+      }
+    } catch (error) {
+      console.error("Error updating answer:", error);
     }
   };
 
   const deleteAnswer = async (id: string): Promise<void> => {
     dispatch({ type: "SET_LOADING", payload: true });
 
-    // await new Promise((resolve) => setTimeout(resolve, 500));
+    try {
+      await API.delete(`/answers/${id}`);
 
-    // const question = state.questions.find((q) =>
-    //   q.answers.some((a) => a._id === id)
-    // );
-    // if (question) {
-    //   dispatch({
-    //     type: "DELETE_ANSWER",
-    //     payload: { questionId: question.id, answerId: id },
-    //   });
-    // }
+      const question = state.questions.find((q) =>
+        q.answers.some((a) => a._id === id)
+      );
+      if (question) {
+        dispatch({
+          type: "DELETE_ANSWER",
+          payload: { questionId: question._id, answerId: id },
+        });
+      }
+    } catch (error) {
+      console.error("Error deleting answer:", error);
+    }
   };
 
   const voteAnswer = async (
@@ -511,14 +454,26 @@ export const ForumProvider: React.FC<{ children: React.ReactNode }> = ({
   ): Promise<void> => {
     if (!user) throw new Error("Must be logged in to vote");
 
-    const question = state.questions.find((q) =>
-      q.answers.some((a) => a._id === id)
-    );
-    if (question) {
-      dispatch({
-        type: "VOTE_ANSWER",
-        payload: { questionId: question._id, answerId: id, vote },
-      });
+    try {
+      const res = await API.post(`/answers/${id}/vote`, { vote });
+
+      const question = state.questions.find((q) =>
+        q.answers.some((a) => a._id === id)
+      );
+      if (question) {
+        const updated = res.data.answer;
+        console.log(updated);
+
+        dispatch({
+          type: "UPDATE_ANSWER",
+          payload: {
+            questionId: question._id,
+            answer: updated,
+          },
+        });
+      }
+    } catch (error) {
+      console.error("Error voting on answer:", error);
     }
   };
 
@@ -527,8 +482,13 @@ export const ForumProvider: React.FC<{ children: React.ReactNode }> = ({
     vote: "like" | "dislike"
   ): Promise<void> => {
     if (!user) throw new Error("Must be logged in to vote");
+    try {
+      const res = await API.post(`/questions/${id}/vote`, { vote });
 
-    dispatch({ type: "VOTE_QUESTION", payload: { id, vote } });
+      dispatch({ type: "UPDATE_QUESTION", payload: { id, updates: res.data.question } });
+    } catch (error) {
+      console.error("Error voting on answer:", error);
+    }
   };
 
   const fetchQuestion = async (id: string): Promise<void> => {

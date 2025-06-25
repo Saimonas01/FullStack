@@ -5,6 +5,7 @@ import {
   createQuestion,
   updateQuestion,
   deleteQuestion,
+  voteQuestion
 } from '../controllers/questionController.js';
 import { protect, optional } from '../middleware/auth.js';
 import {
@@ -25,5 +26,7 @@ router
   .get(validateObjectId('id'), optional, getQuestion)
   .patch(validateObjectId('id'), protect, validateQuestion, updateQuestion)
   .delete(validateObjectId('id'), protect, deleteQuestion);
+
+router.post('/:id/vote', validateObjectId('id'), protect, voteQuestion);
 
 export default router;

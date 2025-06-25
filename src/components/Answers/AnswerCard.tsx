@@ -115,7 +115,6 @@ const AnswerCard: React.FC<AnswerCardProps> = ({ answer }) => {
             </p>
           </div>
 
-          {/* Footer */}
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">

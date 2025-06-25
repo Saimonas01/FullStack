@@ -86,7 +86,8 @@ class Answer {
       { returnDocument: returnNew ? 'after' : 'before' }
     );
 
-    return result.value ? new Answer(result.value) : null;
+
+    return result ? new Answer(result) : null;
   }
 
   static async aggregate(pipeline) {

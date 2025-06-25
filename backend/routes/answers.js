@@ -14,7 +14,7 @@ import {
 const router = express.Router({ mergeParams: true });
 
 router
-  .route('/')
+  .route('/:questionId')
   .post(protect, validateAnswer, createAnswer);
 
 router

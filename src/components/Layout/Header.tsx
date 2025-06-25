@@ -24,7 +24,6 @@ const Header: React.FC = () => {
     <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
             <div className="bg-primary-600 p-2 rounded-lg">
               <Search className="h-6 w-6 text-white" />
@@ -32,7 +31,6 @@ const Header: React.FC = () => {
             <span className="text-2xl font-bold text-gray-900">DevForum</span>
           </Link>
 
-          {/* Enhanced Search Bar */}
           <div className="hidden md:flex flex-1 max-w-lg mx-8">
             <form onSubmit={handleSearch} className="relative w-full">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -48,7 +46,6 @@ const Header: React.FC = () => {
             </form>
           </div>
 
-          {/* Navigation */}
           <nav className="hidden md:flex space-x-8">
             <Link
               to="/"

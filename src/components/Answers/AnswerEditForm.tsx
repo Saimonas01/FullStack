@@ -1,7 +1,7 @@
 import React from 'react';
 import { Save, X } from 'lucide-react';
-import { Answer } from '../../types';
 import { useForum } from '../../contexts/ForumContext';
+import { Answer } from '../../types/questions';
 
 interface AnswerEditFormProps {
   answer: Answer;
@@ -32,7 +32,7 @@ const AnswerEditForm: React.FC<AnswerEditFormProps> = ({ answer, onCancel, onSav
     setError('');
     
     try {
-      await updateAnswer(answer.id, content.trim());
+      await updateAnswer(answer._id, content.trim());
       onSave();
     } catch (error) {
       console.error('Error updating answer:', error);
