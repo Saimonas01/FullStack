@@ -122,12 +122,12 @@ const QuestionCard: React.FC<QuestionCardProps> = ({ question, showActions = fal
               >
                 {question.title}
                 {question.isEdited && (
-                  <span className="ml-2 text-xs text-gray-500 font-normal">(edited)</span>
+                  <span className="ml-2 text-xs text-gray-500 font-normal break-all">(edited)</span>
                 )}
               </Link>
 
               {/* Content Preview */}
-              <p className="mt-2 text-gray-600 line-clamp-2">
+              <p className="mt-2 text-gray-600 line-clamp-2 break-all">
                 {question.content}
               </p>
 

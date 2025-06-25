@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { Search, User, LogOut, Settings } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -128,6 +128,7 @@ const Header: React.FC = () => {
                       <button
                         onClick={() => {
                           logout();
+                          Navigate({to: '/'})
                           setIsProfileMenuOpen(false);
                         }}
                         className="flex items-center w-full px-4 py-2 text-sm text-error-600 hover:bg-error-50"

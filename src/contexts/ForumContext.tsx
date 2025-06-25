@@ -280,7 +280,7 @@ export const useForum = () => {
 export const ForumProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const { user } = useAuth();
+  const { user, updateProfileState } = useAuth();
   const [state, dispatch] = useReducer(forumReducer, {
     questions: [],
     currentQuestion: null,
@@ -360,6 +360,7 @@ export const ForumProvider: React.FC<{ children: React.ReactNode }> = ({
     const res = await API.post("/questions", { title, content, tags });
 
     dispatch({ type: "ADD_QUESTION", payload: res.data.question });
+    updateProfileState({ reputation: res.data.question.author.reputation });
   };
 
   const updateQuestion = async (
@@ -485,7 +486,10 @@ export const ForumProvider: React.FC<{ children: React.ReactNode }> = ({
     try {
       const res = await API.post(`/questions/${id}/vote`, { vote });
 
-      dispatch({ type: "UPDATE_QUESTION", payload: { id, updates: res.data.question } });
+      dispatch({
+        type: "UPDATE_QUESTION",
+        payload: { id, updates: res.data.question },
+      });
     } catch (error) {
       console.error("Error voting on answer:", error);
     }

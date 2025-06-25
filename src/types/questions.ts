@@ -1,5 +1,5 @@
 export interface UserRef {
-  user: string; // user ID
+  user: string;
 }
 
 export interface Author {
@@ -12,9 +12,9 @@ export interface Author {
 export interface Answer {
   _id: string;
   content: string;
-  question: string; // question ID
-  author: Author; // author ID
-  likeCount: number; // array of user refs
+  question: string;
+  author: Author;
+  likeCount: number;
   dislikeCount: number;
   isActive: boolean;
   isEdited: boolean;

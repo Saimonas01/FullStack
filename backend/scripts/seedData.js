@@ -93,7 +93,7 @@ const seedData = async () => {
         views: 245,
         isActive: true,
         isEdited: false,
-        createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000), // 5 days ago
+        createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000), 
         updatedAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000)
       },
       {
@@ -104,7 +104,7 @@ const seedData = async () => {
         views: 189,
         isActive: true,
         isEdited: false,
-        createdAt: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000), // 4 days ago
+        createdAt: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000),
         updatedAt: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000)
       },
       {
@@ -115,7 +115,7 @@ const seedData = async () => {
         views: 156,
         isActive: true,
         isEdited: false,
-        createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000), // 3 days ago
+        createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
         updatedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000)
       },
       {
@@ -126,7 +126,7 @@ const seedData = async () => {
         views: 298,
         isActive: true,
         isEdited: false,
-        createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // 2 days ago
+        createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
         updatedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000)
       },
       {
@@ -137,7 +137,7 @@ const seedData = async () => {
         views: 334,
         isActive: true,
         isEdited: false,
-        createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // 1 day ago
+        createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
         updatedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000)
       },
       {
@@ -148,7 +148,7 @@ const seedData = async () => {
         views: 412,
         isActive: true,
         isEdited: false,
-        createdAt: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000), // 6 days ago
+        createdAt: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000),
         updatedAt: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000)
       },
       {
@@ -159,7 +159,7 @@ const seedData = async () => {
         views: 267,
         isActive: true,
         isEdited: false,
-        createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // 7 days ago
+        createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
         updatedAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
       },
       {
@@ -170,7 +170,7 @@ const seedData = async () => {
         views: 178,
         isActive: true,
         isEdited: false,
-        createdAt: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000), // 8 days ago
+        createdAt: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000),
         updatedAt: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000)
       },
       {
@@ -181,7 +181,7 @@ const seedData = async () => {
         views: 223,
         isActive: true,
         isEdited: false,
-        createdAt: new Date(Date.now() - 9 * 24 * 60 * 60 * 1000), // 9 days ago
+        createdAt: new Date(Date.now() - 9 * 24 * 60 * 60 * 1000),
         updatedAt: new Date(Date.now() - 9 * 24 * 60 * 60 * 1000)
       },
       {
@@ -192,7 +192,7 @@ const seedData = async () => {
         views: 145,
         isActive: true,
         isEdited: false,
-        createdAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000), // 10 days ago
+        createdAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000),
         updatedAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000)
       },
       {
@@ -203,7 +203,7 @@ const seedData = async () => {
         views: 389,
         isActive: true,
         isEdited: false,
-        createdAt: new Date(Date.now() - 11 * 24 * 60 * 60 * 1000), // 11 days ago
+        createdAt: new Date(Date.now() - 11 * 24 * 60 * 60 * 1000),
         updatedAt: new Date(Date.now() - 11 * 24 * 60 * 60 * 1000)
       },
       {
@@ -214,7 +214,7 @@ const seedData = async () => {
         views: 201,
         isActive: true,
         isEdited: false,
-        createdAt: new Date(Date.now() - 12 * 24 * 60 * 60 * 1000), // 12 days ago
+        createdAt: new Date(Date.now() - 12 * 24 * 60 * 60 * 1000),
         updatedAt: new Date(Date.now() - 12 * 24 * 60 * 60 * 1000)
       },
       {
@@ -225,7 +225,7 @@ const seedData = async () => {
         views: 167,
         isActive: true,
         isEdited: false,
-        createdAt: new Date(Date.now() - 13 * 24 * 60 * 60 * 1000), // 13 days ago
+        createdAt: new Date(Date.now() - 13 * 24 * 60 * 60 * 1000), 
         updatedAt: new Date(Date.now() - 13 * 24 * 60 * 60 * 1000)
       },
       {
@@ -236,7 +236,7 @@ const seedData = async () => {
         views: 134,
         isActive: true,
         isEdited: false,
-        createdAt: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000), // 14 days ago
+        createdAt: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000),
         updatedAt: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000)
       },
       {
@@ -247,7 +247,7 @@ const seedData = async () => {
         views: 278,
         isActive: true,
         isEdited: false,
-        createdAt: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000), // 15 days ago
+        createdAt: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000),
         updatedAt: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000)
       },
     ];

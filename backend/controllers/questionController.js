@@ -2,6 +2,7 @@ import Question from "../models/Question.js";
 import Answer from "../models/Answer.js";
 import { getDB } from "../config/database.js";
 import { ObjectId } from "mongodb";
+import { increaseReputation } from "../helpers.js";
 
 export const getQuestions = async (req, res, next) => {
   try {
@@ -44,9 +45,32 @@ export const getQuestions = async (req, res, next) => {
           localField: "_id",
           foreignField: "question",
           as: "answers",
-          pipeline: [{ $match: { isActive: true } }],
+          pipeline: [
+            { $match: { isActive: true } },
+
+            {
+              $lookup: {
+                from: "users",
+                localField: "author",
+                foreignField: "_id",
+                as: "author",
+                pipeline: [
+                  {
+                    $project: {
+                      username: 1,
+                      reputation: 1,
+                      avatar: 1,
+                    },
+                  },
+                ],
+              },
+            },
+
+            { $unwind: "$author" },
+          ],
         },
       },
+
       {
         $addFields: {
           answerCount: { $size: "$answers" },
@@ -305,6 +329,8 @@ export const createQuestion = async (req, res, next) => {
       tags: tags.map((tag) => tag.trim().toLowerCase()),
       author: req.user._id,
     });
+
+    await increaseReputation(req.user._id, 5);
 
     const db = getDB();
     const author = await db

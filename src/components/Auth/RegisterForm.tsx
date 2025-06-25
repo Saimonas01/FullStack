@@ -11,7 +11,6 @@ const RegisterForm: React.FC = () => {
   const [showPassword, setShowPassword] = React.useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
 
-  // Validation schema
   const validationSchema = Yup.object({
     username: Yup.string()
       .min(3, 'Username must be at least 3 characters')
@@ -30,7 +29,6 @@ const RegisterForm: React.FC = () => {
       .required('Please confirm your password'),
   });
 
-  // Initial values
   const initialValues = {
     username: '',
     email: '',

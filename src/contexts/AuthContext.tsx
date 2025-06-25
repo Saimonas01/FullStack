@@ -120,12 +120,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     dispatch({ type: "UPDATE_USER", payload: res.data.user });
   };
 
+  const updateProfileState = (data: Partial<User>) => {
+    dispatch({ type: "UPDATE_USER", payload: { ...state.user, ...data } });
+  };
+
   const value: AuthContextType = {
     user: state.user,
     login,
     register,
     logout,
     updateProfile,
+    updateProfileState,
     isLoading: state.isLoading,
   };
 

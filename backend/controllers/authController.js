@@ -19,7 +19,7 @@ const sendTokenResponse = (user, statusCode, res) => {
   res.status(statusCode).json({
     success: true,
     user: {
-      id: user._id,
+      _id: user._id,
       username: user.username,
       email: user.email,
       bio: user.bio,
@@ -132,7 +132,6 @@ export const updateProfile = async (req, res, next) => {
       });
     }
 
-    // Update user fields
     if (username) user.username = username;
     if (email) user.email = email;
     if (bio !== undefined) user.bio = bio;

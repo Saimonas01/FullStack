@@ -21,12 +21,10 @@ class User {
   static async create(userData) {
     const db = getDB();
 
-    // Validate required fields
     if (!userData.username || !userData.email || !userData.password) {
       throw new Error("Username, email, and password are required");
     }
 
-    // Check if user already exists
     const existingUser = await db.collection("users").findOne({
       $or: [{ email: userData.email }, { username: userData.username }],
     });
@@ -39,7 +37,6 @@ class User {
       );
     }
 
-    // Hash password
     const salt = await bcrypt.genSalt(12);
     const hashedPassword = await bcrypt.hash(userData.password, salt);
 
