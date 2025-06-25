@@ -1,5 +1,5 @@
-import { ObjectId } from 'mongodb';
-import { getDB } from '../config/database.js';
+import { ObjectId } from "mongodb";
+import { getDB } from "../config/database.js";
 
 class Question {
   constructor(questionData) {
@@ -11,26 +11,31 @@ class Question {
     this.views = questionData.views || 0;
     this.isEdited = questionData.isEdited || false;
     this.editedAt = questionData.editedAt;
-    this.isActive = questionData.isActive !== undefined ? questionData.isActive : true;
+    this.isActive =
+      questionData.isActive !== undefined ? questionData.isActive : true;
     this.createdAt = questionData.createdAt || new Date();
     this.updatedAt = questionData.updatedAt || new Date();
+    this.likes = questionData.likes || [];
+    this.dislikes = questionData.dislikes || [];
   }
 
   static async create(questionData) {
     const db = getDB();
-    
+
     if (!questionData.title || !questionData.content || !questionData.author) {
-      throw new Error('Title, content, and author are required');
+      throw new Error("Title, content, and author are required");
     }
 
     const question = new Question({
       ...questionData,
       author: new ObjectId(questionData.author),
       createdAt: new Date(),
-      updatedAt: new Date()
+      updatedAt: new Date(),
+      likes: [],
+      dislikes:[]
     });
 
-    const result = await db.collection('questions').insertOne(question);
+    const result = await db.collection("questions").insertOne(question);
     question._id = result.insertedId;
 
     return question;
@@ -38,31 +43,34 @@ class Question {
 
   static async findById(id) {
     const db = getDB();
-    const questionData = await db.collection('questions').findOne({ 
+    const questionData = await db.collection("questions").findOne({
       _id: new ObjectId(id),
-      isActive: true 
+      isActive: true,
     });
-    
+
     return questionData ? new Question(questionData) : null;
   }
 
   static async find(query = {}, options = {}) {
     const db = getDB();
     const { skip = 0, limit = 10, sort = {} } = options;
-    
-    const questions = await db.collection('questions')
+
+    const questions = await db
+      .collection("questions")
       .find({ ...query, isActive: true })
       .sort(sort)
       .skip(skip)
       .limit(limit)
       .toArray();
 
-    return questions.map(questionData => new Question(questionData));
+    return questions.map((questionData) => new Question(questionData));
   }
 
   static async countDocuments(query = {}) {
     const db = getDB();
-    return await db.collection('questions').countDocuments({ ...query, isActive: true });
+    return await db
+      .collection("questions")
+      .countDocuments({ ...query, isActive: true });
   }
 
   static async findByIdAndUpdate(id, updateData, options = {}) {
@@ -71,7 +79,7 @@ class Question {
 
     const update = {
       ...updateData,
-      updatedAt: new Date()
+      updatedAt: new Date(),
     };
 
     if (updateData.title || updateData.content || updateData.tags) {
@@ -79,18 +87,23 @@ class Question {
       update.editedAt = new Date();
     }
 
-    const result = await db.collection('questions').findOneAndUpdate(
-      { _id: new ObjectId(id), isActive: true },
-      { $set: update },
-      { returnDocument: returnNew ? 'after' : 'before' }
-    );
+    const result = await db
+      .collection("questions")
+      .findOneAndUpdate(
+        { _id: new ObjectId(id), isActive: true },
+        { $set: update },
+        { returnDocument: returnNew ? "after" : "before" }
+      );
 
     return result.value ? new Question(result.value) : null;
   }
 
   static async aggregate(pipeline) {
     const db = getDB();
-    const results = await db.collection('questions').aggregate(pipeline).toArray();
+    const results = await db
+      .collection("questions")
+      .aggregate(pipeline)
+      .toArray();
     return results;
   }
 
@@ -100,12 +113,11 @@ class Question {
 
     if (this._id) {
       const { _id, ...updateData } = this;
-      await db.collection('questions').updateOne(
-        { _id: new ObjectId(_id) },
-        { $set: updateData }
-      );
+      await db
+        .collection("questions")
+        .updateOne({ _id: new ObjectId(_id) }, { $set: updateData });
     } else {
-      const result = await db.collection('questions').insertOne(this);
+      const result = await db.collection("questions").insertOne(this);
       this._id = result.insertedId;
     }
 
@@ -114,11 +126,22 @@ class Question {
 
   async incrementViews() {
     const db = getDB();
-    await db.collection('questions').updateOne(
-      { _id: new ObjectId(this._id) },
-      { $inc: { views: 1 } }
-    );
+    await db
+      .collection("questions")
+      .updateOne({ _id: new ObjectId(this._id) }, { $inc: { views: 1 } });
     this.views += 1;
+  }
+
+  get likeCount() {
+    return this.likes.length;
+  }
+
+  get dislikeCount() {
+    return this.dislikes.length;
+  }
+
+  get score() {
+    return this.likes.length - this.dislikes.length;
   }
 }
 

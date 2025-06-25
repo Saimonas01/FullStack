@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { MessageSquare, Eye, Clock, User, Edit3, Trash2, ThumbsUp, ThumbsDown } from 'lucide-react';
-import { Question } from '../../types';
+import { Question } from '../../types/questions';
 import { useAuth } from '../../contexts/AuthContext';
 import { useForum } from '../../contexts/ForumContext';
 
@@ -21,7 +21,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({ question, showActions = fal
     
     setIsDeleting(true);
     try {
-      await deleteQuestion(question.id);
+      await deleteQuestion(question._id);
     } catch (error) {
       console.error('Error deleting question:', error);
     } finally {
@@ -34,7 +34,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({ question, showActions = fal
     
     setIsVoting(true);
     try {
-      await voteQuestion(question.id, vote);
+      await voteQuestion(question._id, vote);
     } catch (error) {
       console.error('Error voting:', error);
     } finally {
@@ -53,6 +53,8 @@ const QuestionCard: React.FC<QuestionCardProps> = ({ question, showActions = fal
     return date.toLocaleDateString();
   };
 
+  console.log(question, "DEBUIG")
+
   return (
     <div className="bg-white rounded-lg border border-gray-200 hover:border-gray-300 transition-all duration-200 hover:shadow-sm">
       <div className="p-6">
@@ -64,37 +66,37 @@ const QuestionCard: React.FC<QuestionCardProps> = ({ question, showActions = fal
                 <button
                   onClick={() => handleVote('like')}
                   disabled={isVoting}
-                  className={`p-1 rounded-full transition-colors ${
-                    question.userVote === 'like'
-                      ? 'bg-accent-100 text-accent-600'
-                      : 'text-gray-400 hover:text-accent-600 hover:bg-accent-50'
-                  } disabled:opacity-50 disabled:cursor-not-allowed`}
+                  // className={`p-1 rounded-full transition-colors ${
+                  //   question.userVote === 'like'
+                  //     ? 'bg-accent-100 text-accent-600'
+                  //     : 'text-gray-400 hover:text-accent-600 hover:bg-accent-50'
+                  // } disabled:opacity-50 disabled:cursor-not-allowed`}
                 >
                   <ThumbsUp className="h-4 w-4" />
                 </button>
                 
-                <div className="text-center">
+                {/* <div className="text-center">
                   <div className="text-sm font-semibold text-accent-600">
                     {question.likes}
                   </div>
                   <div className="text-xs text-gray-500">likes</div>
-                </div>
+                </div> */}
                 
                 <button
                   onClick={() => handleVote('dislike')}
                   disabled={isVoting}
-                  className={`p-1 rounded-full transition-colors ${
-                    question.userVote === 'dislike'
-                      ? 'bg-error-100 text-error-600'
-                      : 'text-gray-400 hover:text-error-600 hover:bg-error-50'
-                  } disabled:opacity-50 disabled:cursor-not-allowed`}
+                  // className={`p-1 rounded-full transition-colors ${
+                  //   question.userVote === 'dislike'
+                  //     ? 'bg-error-100 text-error-600'
+                  //     : 'text-gray-400 hover:text-error-600 hover:bg-error-50'
+                  // } disabled:opacity-50 disabled:cursor-not-allowed`}
                 >
                   <ThumbsDown className="h-4 w-4" />
                 </button>
                 
                 <div className="text-center">
                   <div className="text-sm font-semibold text-error-600">
-                    {question.dislikes}
+                    {/* {question.dislikes} */}
                   </div>
                   <div className="text-xs text-gray-500">dislikes</div>
                 </div>
@@ -117,7 +119,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({ question, showActions = fal
 
               {/* Title - Make it clickable */}
               <Link
-                to={`/questions/${question.id}`}
+                to={`/questions/${question._id}`}
                 className="text-lg font-semibold text-gray-900 hover:text-primary-600 transition-colors line-clamp-2 block mb-2"
               >
                 {question.title}
@@ -160,10 +162,10 @@ const QuestionCard: React.FC<QuestionCardProps> = ({ question, showActions = fal
                 </div>
 
                 {/* Actions */}
-                {showActions && user && user.id === question.authorId && (
+                {showActions && user && user._id === question.author._id && (
                   <div className="flex items-center space-x-2">
                     <Link
-                      to={`/questions/${question.id}/edit`}
+                      to={`/questions/${question._id}/edit`}
                       className="p-2 text-gray-400 hover:text-primary-600 transition-colors"
                     >
                       <Edit3 className="h-4 w-4" />

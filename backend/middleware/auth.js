@@ -1,5 +1,5 @@
-import jwt from 'jsonwebtoken';
-import User from '../models/User.js';
+import jwt from "jsonwebtoken";
+import User from "../models/User.js";
 
 export const protect = async (req, res, next) => {
   try {
@@ -8,7 +8,6 @@ export const protect = async (req, res, next) => {
     if (req.cookies && req.cookies.token) {
       token = req.cookies.token;
     }
-   
 
     if (!token) {
       return res.status(401).json({
@@ -45,31 +44,21 @@ export const protect = async (req, res, next) => {
   }
 };
 
-
 export const optional = async (req, res, next) => {
-  try {
-    let token;
+  const token = req.cookies?.token || req.headers.authorization?.split(" ")[1];
 
-    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
-      token = req.headers.authorization.split(' ')[1];
-    }
-
-    if (token) {
-      try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const user = await User.findById(decoded.id);
-        
-        if (user && user.isActive) {
-          req.user = user;
-        }
-      } catch (error) {
-        console.log('Optional auth: Invalid token');
-      }
-    }
-
-    next();
-  } catch (error) {
-    console.error('Optional auth middleware error:', error);
-    next();
+  if (!token) {
+    req.user = null;
+    return next();
   }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.id);
+    req.user = user;
+  } catch (error) {
+    req.user = null;
+  }
+
+  next();
 };

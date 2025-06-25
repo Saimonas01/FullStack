@@ -1,5 +1,7 @@
+import { Question } from "./questions";
+
 export interface User {
-  id: string;
+  _id: string;
   username: string;
   email: string;
   avatar?: string;
@@ -8,37 +10,6 @@ export interface User {
   bio?: string;
   location?: string;
   website?: string;
-}
-
-export interface Question {
-  id: string;
-  title: string;
-  content: string;
-  tags: string[];
-  authorId: string;
-  author: User;
-  createdAt: string;
-  updatedAt?: string;
-  isEdited: boolean;
-  answers: Answer[];
-  views: number;
-  likes: number;
-  dislikes: number;
-  userVote?: 'like' | 'dislike' | null;
-}
-
-export interface Answer {
-  id: string;
-  content: string;
-  questionId: string;
-  authorId: string;
-  author: User;
-  createdAt: string;
-  updatedAt?: string;
-  isEdited: boolean;
-  likes: number;
-  dislikes: number;
-  userVote?: 'like' | 'dislike' | null;
 }
 
 export interface AuthContextType {

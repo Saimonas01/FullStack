@@ -18,14 +18,14 @@ const QuestionDetail: React.FC = () => {
     if (id) {
       fetchQuestion(id);
     }
-  }, [id, fetchQuestion]);
+  }, [id]);
 
   const handleDelete = async () => {
     if (!currentQuestion || !confirm('Are you sure you want to delete this question?')) return;
     
     setIsDeleting(true);
     try {
-      await deleteQuestion(currentQuestion.id);
+      await deleteQuestion(currentQuestion._id);
       navigate('/questions');
     } catch (error) {
       console.error('Error deleting question:', error);
@@ -39,7 +39,7 @@ const QuestionDetail: React.FC = () => {
     
     setIsVoting(true);
     try {
-      await voteQuestion(currentQuestion.id, vote);
+      await voteQuestion(currentQuestion._id, vote);
     } catch (error) {
       console.error('Error voting:', error);
     } finally {
@@ -99,10 +99,10 @@ const QuestionDetail: React.FC = () => {
           Back to questions
         </Link>
 
-        {user && user.id === currentQuestion.authorId && (
+        {user && user._id === currentQuestion.author._id && (
           <div className="flex items-center space-x-2">
             <Link
-              to={`/questions/${currentQuestion.id}/edit`}
+              to={`/questions/${currentQuestion._id}/edit`}
               className="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
             >
               <Edit3 className="h-4 w-4 mr-2" />
@@ -128,18 +128,18 @@ const QuestionDetail: React.FC = () => {
             <button
               onClick={() => handleVote('like')}
               disabled={!user || isVoting}
-              className={`p-3 rounded-full transition-colors ${
-                currentQuestion.userVote === 'like'
-                  ? 'bg-accent-100 text-accent-600'
-                  : 'text-gray-400 hover:text-accent-600 hover:bg-accent-50'
-              } disabled:opacity-50 disabled:cursor-not-allowed`}
+              // className={`p-3 rounded-full transition-colors ${
+              //   currentQuestion.userVote === 'like'
+              //     ? 'bg-accent-100 text-accent-600'
+              //     : 'text-gray-400 hover:text-accent-600 hover:bg-accent-50'
+              // } disabled:opacity-50 disabled:cursor-not-allowed`}
             >
               <ThumbsUp className="h-6 w-6" />
             </button>
             
             <div className="text-center">
               <div className="text-2xl font-bold text-accent-600">
-                {currentQuestion.likes}
+                {/* {currentQuestion.likes} */}
               </div>
               <div className="text-sm text-gray-500">likes</div>
             </div>
@@ -147,18 +147,18 @@ const QuestionDetail: React.FC = () => {
             <button
               onClick={() => handleVote('dislike')}
               disabled={!user || isVoting}
-              className={`p-3 rounded-full transition-colors ${
-                currentQuestion.userVote === 'dislike'
-                  ? 'bg-error-100 text-error-600'
-                  : 'text-gray-400 hover:text-error-600 hover:bg-error-50'
-              } disabled:opacity-50 disabled:cursor-not-allowed`}
+              // className={`p-3 rounded-full transition-colors ${
+              //   currentQuestion.userVote === 'dislike'
+              //     ? 'bg-error-100 text-error-600'
+              //     : 'text-gray-400 hover:text-error-600 hover:bg-error-50'
+              // } disabled:opacity-50 disabled:cursor-not-allowed`}
             >
               <ThumbsDown className="h-6 w-6" />
             </button>
             
             <div className="text-center">
               <div className="text-2xl font-bold text-error-600">
-                {currentQuestion.dislikes}
+                {/* {currentQuestion.dislikes} */}
               </div>
               <div className="text-sm text-gray-500">dislikes</div>
             </div>
@@ -240,9 +240,9 @@ const QuestionDetail: React.FC = () => {
         {currentQuestion.answers.length > 0 ? (
           <div className="space-y-6">
             {currentQuestion.answers
-              .sort((a, b) => b.likes - b.dislikes - (a.likes - a.dislikes))
+              .sort((a, b) => b.likes.length - b.dislikes.length - (a.likes.length - a.dislikes.length))
               .map((answer) => (
-                <AnswerCard key={answer.id} answer={answer} />
+                <AnswerCard key={answer._id} answer={answer} />
               ))}
           </div>
         ) : (
@@ -256,7 +256,7 @@ const QuestionDetail: React.FC = () => {
 
       {/* Answer Form */}
       {user ? (
-        <AnswerForm questionId={currentQuestion.id} />
+        <AnswerForm questionId={currentQuestion._id} />
       ) : (
         <div className="bg-gray-50 rounded-lg p-6 text-center">
           <p className="text-gray-600 mb-4">Sign in to answer this question</p>

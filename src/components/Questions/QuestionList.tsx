@@ -436,7 +436,7 @@ const QuestionList: React.FC = () => {
         <>
           <div className="space-y-4 mb-8">
             {paginatedQuestions.map((question) => (
-              <QuestionCard key={question.id} question={question} showActions />
+              <QuestionCard key={question._id} question={question} showActions />
             ))}
           </div>
 

@@ -1,9 +1,9 @@
 import React from 'react';
 import { Edit3, Trash2, ThumbsUp, ThumbsDown, Clock, User } from 'lucide-react';
-import { Answer } from '../../types';
 import { useAuth } from '../../contexts/AuthContext';
 import { useForum } from '../../contexts/ForumContext';
 import AnswerEditForm from './AnswerEditForm';
+import { Answer } from '../../types/questions';
 
 interface AnswerCardProps {
   answer: Answer;
@@ -21,7 +21,7 @@ const AnswerCard: React.FC<AnswerCardProps> = ({ answer }) => {
     
     setIsDeleting(true);
     try {
-      await deleteAnswer(answer.id);
+      await deleteAnswer(answer._id);
     } catch (error) {
       console.error('Error deleting answer:', error);
     } finally {
@@ -34,7 +34,7 @@ const AnswerCard: React.FC<AnswerCardProps> = ({ answer }) => {
     
     setIsVoting(true);
     try {
-      await voteAnswer(answer.id, vote);
+      await voteAnswer(answer._id, vote);
     } catch (error) {
       console.error('Error voting:', error);
     } finally {
@@ -82,7 +82,7 @@ const AnswerCard: React.FC<AnswerCardProps> = ({ answer }) => {
           
           <div className="text-center">
             <div className="text-lg font-semibold text-accent-600">
-              {answer.likes}
+              {answer.likes.length}
             </div>
             <div className="text-xs text-gray-500">likes</div>
           </div>
@@ -101,7 +101,7 @@ const AnswerCard: React.FC<AnswerCardProps> = ({ answer }) => {
           
           <div className="text-center">
             <div className="text-lg font-semibold text-error-600">
-              {answer.dislikes}
+              {answer.dislikes.length}
             </div>
             <div className="text-xs text-gray-500">dislikes</div>
           </div>
@@ -132,7 +132,7 @@ const AnswerCard: React.FC<AnswerCardProps> = ({ answer }) => {
             </div>
 
             {/* Actions */}
-            {user && user.id === answer.authorId && (
+            {user && user.id === answer.author._id && (
               <div className="flex items-center space-x-2">
                 <button
                   onClick={() => setIsEditing(true)}

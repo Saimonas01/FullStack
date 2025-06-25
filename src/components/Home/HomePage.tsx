@@ -14,6 +14,7 @@ const HomePage: React.FC = () => {
     .slice(0, 5);
 
   const tagCounts = questions.reduce((acc, question) => {
+    console.log(question, "AA")
     question.tags.forEach(tag => {
       acc[tag] = (acc[tag] || 0) + 1;
     });
@@ -145,7 +146,7 @@ const HomePage: React.FC = () => {
           
           <div className="space-y-4">
             {recentQuestions.map((question) => (
-              <QuestionCard key={question.id} question={question} />
+              <QuestionCard key={question._id} question={question} />
             ))}
           </div>
         </div>
