@@ -1,22 +1,22 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Save, ArrowLeft } from 'lucide-react';
-import { useAuth } from '../../contexts/AuthContext';
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import { Save, ArrowLeft } from "lucide-react";
+import { useAuth } from "../../contexts/AuthContext";
 
 const SettingsPage: React.FC = () => {
   const navigate = useNavigate();
   const { user, updateProfile, isLoading } = useAuth();
 
   const [formData, setFormData] = React.useState({
-    username: user?.username || '',
-    email: user?.email || '',
-    bio: user?.bio || '',
-    location: user?.location || '',
-    website: user?.website || '',
+    username: user?.username || "",
+    email: user?.email || "",
+    bio: user?.bio || "",
+    location: user?.location || "",
+    website: user?.website || "",
   });
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [success, setSuccess] = React.useState(false);
-  const [errors, setErrors] = React.useState<{[key: string]: string}>({});
+  const [errors, setErrors] = React.useState<{ [key: string]: string }>({});
 
   if (!user) {
     return (
@@ -28,14 +28,16 @@ const SettingsPage: React.FC = () => {
   }
 
   const validateForm = () => {
-    const newErrors: {[key: string]: string} = {};
+    const newErrors: { [key: string]: string } = {};
 
-    if (!formData.username.trim()) newErrors.username = 'Username is required';
-    if (formData.username.length < 3) newErrors.username = 'Username must be at least 3 characters';
-    if (!formData.email.trim()) newErrors.email = 'Email is required';
-    if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = 'Email is invalid';
-    if (formData.website && !formData.website.startsWith('http')) {
-      newErrors.website = 'Website must start with http:// or https://';
+    if (!formData.username.trim()) newErrors.username = "Username is required";
+    if (formData.username.length < 3)
+      newErrors.username = "Username must be at least 3 characters";
+    if (!formData.email.trim()) newErrors.email = "Email is required";
+    if (!/\S+@\S+\.\S+/.test(formData.email))
+      newErrors.email = "Email is invalid";
+    if (formData.website && !formData.website.startsWith("http")) {
+      newErrors.website = "Website must start with http:// or https://";
     }
 
     setErrors(newErrors);
@@ -44,12 +46,12 @@ const SettingsPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) return;
 
     setIsSubmitting(true);
     setSuccess(false);
-    
+
     try {
       await updateProfile({
         username: formData.username.trim(),
@@ -59,18 +61,28 @@ const SettingsPage: React.FC = () => {
         website: formData.website.trim(),
       });
       setSuccess(true);
-    } catch (error) {
-      console.error('Error updating profile:', error);
-      setErrors({ submit: 'Failed to update profile. Please try again.' });
+    } catch (error:any) {
+      if (
+        error?.response?.data?.errors &&
+        Array.isArray(error.response.data.errors)
+      ) {
+        const fieldErrors: { [key: string]: string } = {};
+        error.response.data.errors.forEach((err: any) => {
+          if (err.path && err.msg) {
+            fieldErrors[err.path] = err.msg;
+          }
+        });
+        setErrors({...fieldErrors,submit: "Failed to update profile. Please try again."  }); 
+      }
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
     if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: '' }));
+      setErrors((prev) => ({ ...prev, [field]: "" }));
     }
     setSuccess(false);
   };
@@ -106,50 +118,63 @@ const SettingsPage: React.FC = () => {
 
           {/* Username */}
           <div>
-            <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-2">
+            <label
+              htmlFor="username"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
               Username *
             </label>
             <input
               type="text"
               id="username"
               value={formData.username}
-              onChange={(e) => handleInputChange('username', e.target.value)}
+              onChange={(e) => handleInputChange("username", e.target.value)}
               className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 ${
-                errors.username ? 'border-error-300' : 'border-gray-300'
+                errors.username ? "border-error-300" : "border-gray-300"
               }`}
               placeholder="Your username"
             />
-            {errors.username && <p className="mt-1 text-sm text-error-600">{errors.username}</p>}
+            {errors.username && (
+              <p className="mt-1 text-sm text-error-600">{errors.username}</p>
+            )}
           </div>
 
           {/* Email */}
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
               Email *
             </label>
             <input
               type="email"
               id="email"
               value={formData.email}
-              onChange={(e) => handleInputChange('email', e.target.value)}
+              onChange={(e) => handleInputChange("email", e.target.value)}
               className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 ${
-                errors.email ? 'border-error-300' : 'border-gray-300'
+                errors.email ? "border-error-300" : "border-gray-300"
               }`}
               placeholder="your.email@example.com"
             />
-            {errors.email && <p className="mt-1 text-sm text-error-600">{errors.email}</p>}
+            {errors.email && (
+              <p className="mt-1 text-sm text-error-600">{errors.email}</p>
+            )}
           </div>
 
           {/* Bio */}
           <div>
-            <label htmlFor="bio" className="block text-sm font-medium text-gray-700 mb-2">
+            <label
+              htmlFor="bio"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
               Bio
             </label>
             <textarea
               id="bio"
               rows={4}
               value={formData.bio}
-              onChange={(e) => handleInputChange('bio', e.target.value)}
+              onChange={(e) => handleInputChange("bio", e.target.value)}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
               placeholder="Tell us about yourself..."
             />
@@ -160,14 +185,17 @@ const SettingsPage: React.FC = () => {
 
           {/* Location */}
           <div>
-            <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-2">
+            <label
+              htmlFor="location"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
               Location
             </label>
             <input
               type="text"
               id="location"
               value={formData.location}
-              onChange={(e) => handleInputChange('location', e.target.value)}
+              onChange={(e) => handleInputChange("location", e.target.value)}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
               placeholder="City, Country"
             />
@@ -175,20 +203,25 @@ const SettingsPage: React.FC = () => {
 
           {/* Website */}
           <div>
-            <label htmlFor="website" className="block text-sm font-medium text-gray-700 mb-2">
+            <label
+              htmlFor="website"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
               Website
             </label>
             <input
               type="url"
               id="website"
               value={formData.website}
-              onChange={(e) => handleInputChange('website', e.target.value)}
+              onChange={(e) => handleInputChange("website", e.target.value)}
               className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 ${
-                errors.website ? 'border-error-300' : 'border-gray-300'
+                errors.website ? "border-error-300" : "border-gray-300"
               }`}
               placeholder="https://yourwebsite.com"
             />
-            {errors.website && <p className="mt-1 text-sm text-error-600">{errors.website}</p>}
+            {errors.website && (
+              <p className="mt-1 text-sm text-error-600">{errors.website}</p>
+            )}
           </div>
 
           {/* Submit */}

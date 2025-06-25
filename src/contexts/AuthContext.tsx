@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useReducer, useEffect } from "react";
 import { AuthContextType, User } from "../types";
 import API from "../api";
+import { useLoading } from "./GlobalLoadingContext";
 
 interface AuthState {
   user: User | null;
@@ -48,16 +49,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     user: null,
     isLoading: true,
   });
+  const { setGlobalLoading } = useLoading();
 
   useEffect(() => {
-
     API.get("auth/me")
       .then((res: any) => {
         dispatch({ type: "SET_USER", payload: res.data.user });
       })
-      .catch((e:any) => {
-        dispatch({ type: "SET_LOADING", payload: false });
+      .catch((e: any) => {
         throw new Error(e.message);
+      })
+      .finally(() => {
+        dispatch({ type: "SET_LOADING", payload: false });
+        setGlobalLoading(false);
       });
   }, []);
 
@@ -68,11 +72,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       .then((res: any) => {
         dispatch({ type: "SET_USER", payload: res.data.user });
       })
-      .catch((e:any) => {
-        dispatch({ type: "SET_LOADING", payload: false });
+      .catch((e: any) => {
         throw new Error(e.message);
-      });
-
+      })
+      .finally(() => dispatch({ type: "SET_LOADING", payload: false }));
   };
 
   const register = async (
@@ -81,20 +84,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     password: string
   ): Promise<void> => {
     dispatch({ type: "SET_LOADING", payload: true });
-    
-    API.post("auth/register", { email,username, password })
+
+    API.post("auth/register", { email, username, password })
       .then((res: any) => {
         dispatch({ type: "SET_USER", payload: res.data.user });
       })
-      .catch((e:any) => {
-        dispatch({ type: "SET_LOADING", payload: false });
+      .catch((e: any) => {
         throw new Error(e.message);
-      });
+      })
+      .finally(() => dispatch({ type: "SET_LOADING", payload: false }));
   };
 
   const logout = () => {
-    localStorage.removeItem("currentUser");
-    dispatch({ type: "LOGOUT" });
+    API.get("auth/logout")
+      .then(() => {
+        dispatch({ type: "LOGOUT" });
+      })
+      .catch((e: any) => {
+        throw new Error(e.message);
+      })
+      .finally(() => dispatch({ type: "SET_LOADING", payload: false }));
   };
 
   const updateProfile = async (data: Partial<User>): Promise<void> => {
@@ -102,12 +111,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
     dispatch({ type: "SET_LOADING", payload: true });
 
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
     const updatedUser = { ...state.user, ...data };
-    localStorage.setItem("currentUser", JSON.stringify(updatedUser));
-    dispatch({ type: "UPDATE_USER", payload: data });
-    dispatch({ type: "SET_LOADING", payload: false });
+
+    const res = await API.put("auth/profile", updatedUser).finally(() =>
+      dispatch({ type: "SET_LOADING", payload: false })
+    );
+
+    dispatch({ type: "UPDATE_USER", payload: res.data.user });
   };
 
   const value: AuthContextType = {

@@ -100,11 +100,10 @@ export const updateProfile = async (req, res, next) => {
   try {
     const { username, email, bio, location, website } = req.body;
 
-    // Check if username or email is taken by another user
     if (username || email) {
       const existingUser = await User.findOne({
         $and: [
-          { _id: { $ne: req.user.id } },
+          { _id: { $ne: req.user._id } },
           {
             $or: [
               ...(username ? [{ username }] : []),
@@ -125,7 +124,7 @@ export const updateProfile = async (req, res, next) => {
       }
     }
 
-    const user = await User.findById(req.user.id);
+    const user = await User.findById(req.user._id);
     if (!user) {
       return res.status(404).json({
         success: false,
@@ -149,4 +148,18 @@ export const updateProfile = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
+};
+
+export const logout = (_req, res) => {
+  res.cookie("token", "", {
+    httpOnly: true,
+    expires: new Date(0),
+    sameSite: "Strict",
+    secure: true,
+  });
+
+  res.status(200).json({
+    success: true,
+    message: "Logged out successfully",
+  });
 };
