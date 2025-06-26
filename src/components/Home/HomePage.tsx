@@ -16,7 +16,7 @@ import QuestionCard from "../Questions/QuestionCard";
 
 const HomePage: React.FC = () => {
   const { user } = useAuth();
-  const { questions, setFilters, setPage, setLimit } = useForum();
+  const { questions, setFilters, setPage, setLimit, pagination } = useForum();
 
   const recentQuestions = questions
     .sort(
@@ -135,7 +135,7 @@ const HomePage: React.FC = () => {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
         <div className="text-center p-4 bg-white rounded-lg border border-gray-200">
           <MessageSquare className="h-8 w-8 text-primary-600 mx-auto mb-2" />
-          <p className="text-2xl font-bold text-gray-900">{questions.length}</p>
+          <p className="text-2xl font-bold text-gray-900">{pagination.totalItems}</p>
           <p className="text-gray-600">Questions</p>
         </div>
 

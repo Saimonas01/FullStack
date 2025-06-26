@@ -135,7 +135,7 @@ const QuestionList: React.FC = () => {
     }, 1000);
 
     return () => clearTimeout(delayedSearch);
-  }, [searchInput, searchQuery, searchParams, setSearchParams]);
+  }, [searchInput, searchQuery, searchParams]);
 
   React.useEffect(() => {
     setFilters({
@@ -145,7 +145,7 @@ const QuestionList: React.FC = () => {
       status: searchParams.get("status") || "all",
     });
     setPage(parseInt(searchParams.get("page") || "1"));
-    setLimit(50)
+    setLimit(20)
   }, [searchParams]);
 
   const paginatedQuestions = questions;

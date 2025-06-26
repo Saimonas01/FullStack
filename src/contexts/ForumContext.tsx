@@ -331,13 +331,9 @@ export const ForumProvider: React.FC<{ children: React.ReactNode }> = ({
 
       dispatch({ type: "SET_QUESTIONS", payload: res.data.questions });
 
-      if (res.data.totalPages) {
         dispatch({ type: "SET_TOTAL_PAGES", payload: res.data.totalPages });
-      }
 
-      if (res.data.total) {
         dispatch({ type: "SET_TOTAL_ITEMS", payload: res.data.total });
-      }
     } catch (error) {
       console.error("Error fetching questions:", error);
       dispatch({ type: "SET_QUESTIONS", payload: [] });

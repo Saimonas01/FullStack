@@ -8,6 +8,7 @@ import {
   Settings,
   MessageSquare,
   ThumbsUp,
+  Loader,
 } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useForum } from "../../contexts/ForumContext";
@@ -16,9 +17,19 @@ import { Question } from "../../types/questions";
 
 const ProfilePage: React.FC = () => {
   const { user } = useAuth();
-  const { questions } = useForum();
+  const { questions, setFilters, setLimit, isLoading } = useForum();
   const [userQuestions, setUserQuestions] = React.useState<Question[]>([]);
   const [totalAnswers, setTotalAnswers] = React.useState(0);
+
+  React.useEffect(() => {
+    setFilters({
+      search: "",
+      sort: "date",
+      order: "desc",
+      status: "all",
+    });
+    setLimit(50);
+  }, []);
 
   React.useEffect(() => {
     if (!user || !questions.length) return;
@@ -119,68 +130,78 @@ const ProfilePage: React.FC = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div className="bg-white rounded-lg border border-gray-200 p-6 text-center">
-          <MessageSquare className="h-8 w-8 text-primary-600 mx-auto mb-2" />
-          <p className="text-2xl font-bold text-gray-900">
-            {userQuestions.length}
-          </p>
-          <p className="text-gray-600">Questions Asked</p>
-        </div>
+      {!isLoading ? (
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div className="bg-white rounded-lg border border-gray-200 p-6 text-center">
+              <MessageSquare className="h-8 w-8 text-primary-600 mx-auto mb-2" />
+              <p className="text-2xl font-bold text-gray-900">
+                {userQuestions.length}
+              </p>
+              <p className="text-gray-600">Questions Asked</p>
+            </div>
 
-        <div className="bg-white rounded-lg border border-gray-200 p-6 text-center">
-          <ThumbsUp className="h-8 w-8 text-accent-600 mx-auto mb-2" />
-          <p className="text-2xl font-bold text-gray-900">{totalAnswers}</p>
-          <p className="text-gray-600">Answers Given</p>
-        </div>
+            <div className="bg-white rounded-lg border border-gray-200 p-6 text-center">
+              <ThumbsUp className="h-8 w-8 text-accent-600 mx-auto mb-2" />
+              <p className="text-2xl font-bold text-gray-900">{totalAnswers}</p>
+              <p className="text-gray-600">Answers Given</p>
+            </div>
 
-        <div className="bg-white rounded-lg border border-gray-200 p-6 text-center">
-          <User className="h-8 w-8 text-secondary-600 mx-auto mb-2" />
-          <p className="text-2xl font-bold text-gray-900">{user.reputation}</p>
-          <p className="text-gray-600">Reputation</p>
-        </div>
-      </div>
-
-      <div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-6">
-          Your Questions
-        </h2>
-
-        {userQuestions.length > 0 ? (
-          <div className="space-y-4">
-            {userQuestions
-              .sort(
-                (a, b) =>
-                  new Date(b.createdAt).getTime() -
-                  new Date(a.createdAt).getTime()
-              )
-              .slice(0, 10)
-              .map((question) => (
-                <QuestionCard
-                  key={question._id}
-                  question={question}
-                  showActions
-                />
-              ))}
+            <div className="bg-white rounded-lg border border-gray-200 p-6 text-center">
+              <User className="h-8 w-8 text-secondary-600 mx-auto mb-2" />
+              <p className="text-2xl font-bold text-gray-900">
+                {user.reputation}
+              </p>
+              <p className="text-gray-600">Reputation</p>
+            </div>
           </div>
-        ) : (
-          <div className="text-center py-12 bg-gray-50 rounded-lg">
-            <MessageSquare className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
-              No questions yet
-            </h3>
-            <p className="text-gray-500 mb-4">
-              You haven't asked any questions yet.
-            </p>
-            <Link
-              to="/ask"
-              className="inline-flex items-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700"
-            >
-              Ask Your First Question
-            </Link>
+
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">
+              Your Questions
+            </h2>
+
+            {userQuestions.length > 0 ? (
+              <div className="space-y-4">
+                {userQuestions
+                  .sort(
+                    (a, b) =>
+                      new Date(b.createdAt).getTime() -
+                      new Date(a.createdAt).getTime()
+                  )
+                  .slice(0, 10)
+                  .map((question) => (
+                    <QuestionCard
+                      key={question._id}
+                      question={question}
+                      showActions
+                    />
+                  ))}
+              </div>
+            ) : (
+              <div className="text-center py-12 bg-gray-50 rounded-lg">
+                <MessageSquare className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-gray-900 mb-2">
+                  No questions yet
+                </h3>
+                <p className="text-gray-500 mb-4">
+                  You haven't asked any questions yet.
+                </p>
+                <Link
+                  to="/ask"
+                  className="inline-flex items-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700"
+                >
+                  Ask Your First Question
+                </Link>
+              </div>
+            )}
           </div>
-        )}
-      </div>
+        </>
+      ) : (
+        <div className="flex items-center justify-center">
+          <Loader className="animate-spin h-10 w-10 text-gray-700" />
+        </div>
+      )}
     </div>
   );
 };

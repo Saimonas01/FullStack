@@ -188,7 +188,7 @@ const QuestionDetail: React.FC = () => {
 
             {/* Content */}
             <div className="prose max-w-none mb-6">
-              <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
+              <p className="text-gray-700 leading-relaxed whitespace-pre-wrap break-all">
                 {currentQuestion.content}
               </p>
             </div>
